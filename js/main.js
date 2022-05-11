@@ -1,74 +1,61 @@
+
 // Start Landing Section
-const sliderText = Array.from(document.querySelectorAll(".landing .text"));
-const sliderBullet = Array.from(
-  document.querySelectorAll(".landing .bullets li")
-);
-const btnNext = document.querySelector(".landing .change-right");
-const btnPrevious = document.querySelector(".landing .change-left");
+function createSlider(...classNames) {
+  const sliderText = Array.from(document.querySelectorAll(classNames[0])),
+    sliderBullet = Array.from(document.querySelectorAll(classNames[1])),
+    btnNext = document.querySelector(classNames[2]),
+    btnPrevious = document.querySelector(classNames[3]);
+  return class {
 
-let currentSlide = 1;
-sliderText[currentSlide - 1].classList.add("active");
-sliderBullet[currentSlide - 1].classList.add("active");
+    #currentSlide = 0;
 
-btnNext.addEventListener("click", () => {
-  
-  btnPrevious.classList.remove("disabled");
-  sliderText.forEach((ele) => {
-    ele.classList.remove("active");
-  });
-  sliderBullet.forEach((ele) => {
-    ele.classList.remove("active");
-  });
-  if (currentSlide < sliderText.length) {
-    currentSlide++;
-    sliderText[currentSlide - 1].classList.add("active");
-    sliderBullet[currentSlide - 1].classList.add("active");
-  } else {
-    btnNext.classList.add("disabled");
-    sliderBullet[sliderBullet.length - 1].classList.add("active");
+    startSlider() {
+      sliderText[this.#currentSlide].classList.add("active");
+      sliderBullet[this.#currentSlide].classList.add("active");
+      return this;
+    }
+
+    eventHandler(isNext) {
+      (isNext ? btnPrevious : btnNext).classList.remove("disabled");
+        sliderText.forEach((ele) => {
+        ele.classList.remove("active");
+      });
+        sliderBullet.forEach((ele) => {
+        ele.classList.remove("active");
+      });
+      if (isNext) {
+        if (this.#currentSlide < (sliderText.length - 1)) {
+          this.#currentSlide++;
+          this.startSlider();
+        } else {
+              btnNext.classList.add("disabled");
+              sliderBullet[sliderBullet.length - 1].classList.add("active");
+        }
+      } else {
+        if (this.#currentSlide) {
+          this.#currentSlide--;
+          this.startSlider();
+        } else {
+              btnPrevious.classList.add("disabled");
+              sliderBullet[0].classList.add("active");
+        }
+      }
+          sliderText[this.#currentSlide].classList.add("active");
+    }
   }
-  sliderText[currentSlide - 1].classList.add("active");
-});
+}
 
-btnPrevious.addEventListener("click", () => {
-  btnNext.classList.remove("disabled");
-  sliderText.forEach((ele) => {
-    ele.classList.remove("active");
-  });
-  sliderBullet.forEach((ele) => {
-    ele.classList.remove("active");
-  });
-  if (currentSlide !== 1) {
-    currentSlide--;
-    sliderText[currentSlide - 1].classList.add("active");
-    sliderBullet[currentSlide - 1].classList.add("active");
-  } else {
-    btnPrevious.classList.add("disabled");
-    sliderBullet[0].classList.add("active");
-  }
-  sliderText[currentSlide - 1].classList.add("active");
-});
+const Slider = createSlider(".landing .text", ".landing .bullets li", ".landing .change-right", ".landing .change-left");
+const slider = new Slider();
 
-// bullet function only
-sliderBullet.forEach((bullet) => {
-  bullet.addEventListener("click", (e) => {
-    sliderBullet.forEach((ele) => {
-      ele.classList.remove("active");
-    });
-    e.currentTarget.classList.add("active");
-    sliderText.forEach((ele) => {
-      ele.classList.remove("active");
-    });
-    document
-      .querySelector(e.currentTarget.dataset.text)
-      .classList.add("active");
-  });
-});
+slider.startSlider();
 
+document.querySelector(".landing .change-right").onclick = () => slider.eventHandler(true);
+document.querySelector(".landing .change-left").onclick = () => slider.eventHandler(false);
 // End Landing Section
 
-// Start Portfolio Section
 
+// Start Portfolio Section
 const imagesContainer = Array.from(
   document.querySelectorAll(".portfolio .images-container div")
 );
@@ -95,11 +82,9 @@ btn.addEventListener("click", () => {
   btn.style.display = "none";
   moreImages.style.cssText = "margin-top: 40px; display: flex; flex-wrap: wrap";
 });
-
 // End Portfolio Section
 
 // Start About Section and Nav Bar
-
 let statsSpans = document.querySelectorAll(".stats .container .box span");
 let progressSpans = document.querySelectorAll(".chart span");
 const sections = document.querySelectorAll("section");
